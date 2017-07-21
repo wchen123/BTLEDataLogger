@@ -20,10 +20,22 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.jjoe64.graphview.GraphView;
+import com.jjoe64.graphview.Viewport;
+import com.jjoe64.graphview.series.DataPoint;
+import com.jjoe64.graphview.series.LineGraphSeries;
+
+import java.util.Random;
+
 
 public class UARTDisplayActivity extends BaseActivity {
     // tag for logging
     private final static String TAG = UARTService.class.getSimpleName();
+    private static final Random RANDOM = new Random();
+    private LineGraphSeries<DataPoint> series;
+    private int lastX = 0;
+
+
 
     private EditText logFileNameEditText;
     private Button startStopLogButton;
@@ -51,6 +63,22 @@ public class UARTDisplayActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_uartdisplay);
 
+
+
+        //we get graph view instance
+        GraphView graph = (GraphView)findViewById(R.id.logGraphView);
+        //data
+        series = new LineGraphSeries<DataPoint>();
+        graph.addSeries(series);
+        //customize a little bit view port
+        Viewport viewport = graph.getViewport();
+        viewport.setYAxisBoundsManual(true);
+        viewport.setMinY(0);
+        viewport.setMaxY(1000);
+        viewport.setScrollable(true);
+
+
+
         logFileNameEditText = (EditText)findViewById(R.id.logFileNameEditText);
         startStopLogButton = (Button)findViewById(R.id.startStopLogButton);
         logTextView = (TextView)findViewById(R.id.logTextView);
@@ -76,6 +104,44 @@ public class UARTDisplayActivity extends BaseActivity {
         Intent logServiceIntent = new Intent(this, LogService.class);
         bindService(logServiceIntent, logServiceConnection, Context.BIND_AUTO_CREATE);
     }
+
+    //wu's code
+    //@Override
+//    protected void onResume() {
+//        super.onResume();
+//        for (int i=0; i< 100; i++) {
+//            addEntry();
+//        }
+
+        //we 're going to simulate with thread that append data to the graph
+//        new Thread(new Runnable() {
+//            @Override
+//            public void run() {
+//                //we add 100 new enties
+//                for (int i=0; i< 100; i++) {
+//                    runOnUiThread(new Runnable() {
+//                        @Override
+//                        public void run() {
+//                            addEntry();
+//                        }
+//                    });
+//
+//                    //sllep to slow down the add of entries
+//                    try{
+//                        Thread.sleep(600);
+//
+//                    }catch (InterruptedException e){
+//                        // e.printStackTrace();
+//                    }
+//
+//                }
+//            }
+//        });
+  //  }
+
+
+
+
 
     private static IntentFilter makeGattUpdateIntentFilter() {
         final IntentFilter intentFilter = new IntentFilter();
@@ -180,6 +246,13 @@ public class UARTDisplayActivity extends BaseActivity {
     };
 
     private void addToLog(final String text) {
+
+//        try {
+//            Thread.sleep(600);
+//        }catch (InterruptedException e) {
+//
+//        }
+
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -247,6 +320,16 @@ public class UARTDisplayActivity extends BaseActivity {
                     final byte[] rxData = intent.getByteArrayExtra(UARTService.EXTRA_DATA_RX);
                     try {
                         String text = new String(rxData, "UTF-8");
+                        Log.d("data", "text---> " + text);
+                        String[] received_Data = text.split(",");
+                        String received_Data0 = received_Data[0];
+                        String received_Data1 = received_Data[1];
+                        String received_Data2 = received_Data[2];
+
+                        int channel_0 = Integer.parseInt(received_Data0);
+                        Log.d("data", "receivedData---------------------> " + channel_0);
+                        addEntry(channel_0);
+
                         addToLog(text);
                     }
                     catch(Exception e) {
@@ -316,4 +399,29 @@ public class UARTDisplayActivity extends BaseActivity {
             inputManager.hideSoftInputFromWindow((null == getCurrentFocus()) ? null : getCurrentFocus().getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
         }
     }
+
+    //add random data to graph
+    private void addEntry(int y) {
+       // double rdNum = RANDOM.nextDouble() * 1000d;
+       // Log.d("ddd ", "random----------->" + rdNum);
+
+        //here, we choose to display max 10 point on the view port and we scroll to end
+        series.appendData(new DataPoint(lastX++, y), true, 50);
+    }
+//    private void addEntry() {
+//        //here, we choose to display max 10 point on the view port and we scroll to end
+//        runOnUiThread(new Runnable() {
+//            @Override
+//            public void run() {
+//                try {
+//                    series.appendData(new DataPoint(lastX++, RANDOM.nextDouble() * 10d), true, 10);
+//                    Log.d("ddd ", "random----------->" + RANDOM.nextDouble());
+//                }
+//                catch(Exception e) {
+//                    Log.e(TAG, e.toString());
+//                }
+//            }
+//
+//        });
+//    }
 }
