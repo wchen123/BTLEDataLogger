@@ -71,11 +71,29 @@ public class UARTDisplayActivity extends BaseActivity {
         series = new LineGraphSeries<DataPoint>();
         graph.addSeries(series);
         //customize a little bit view port
+     //   graph.getLegendRenderer().setWidth(90);
         Viewport viewport = graph.getViewport();
-        viewport.setYAxisBoundsManual(true);
-        viewport.setMinY(0);
-        viewport.setMaxY(1000);
+//        viewport.setYAxisBoundsManual(true);
+//        viewport.setMinY(0);
+//        viewport.setMaxY(1000);
+//        viewport.setScrollable(true);
+
+        // activate horizontal zooming and scrolling
+        viewport.setScalable(true);
+
+// activate horizontal scrolling
         viewport.setScrollable(true);
+
+// activate horizontal and vertical zooming and scrolling
+        viewport.setScalableY(true);
+
+// activate vertical scrolling
+         viewport.setScrollableY(true);
+
+        graph.getGridLabelRenderer().setPadding(96);
+     //   graph.getGridLabelRenderer().setNumHorizontalLabels(6);
+      //  graph.getGridLabelRenderer().setNumVerticalLabels(32);
+      //  graph.getGridLabelRenderer().setLabelVerticalWidth(32);
 
 
 
@@ -327,7 +345,8 @@ public class UARTDisplayActivity extends BaseActivity {
                         String received_Data2 = received_Data[2];
 
                         int channel_0 = Integer.parseInt(received_Data0);
-                        Log.d("data", "receivedData---------------------> " + channel_0);
+                        double channel_0_d = channel_0/10000.0;
+                        Log.d("data", "receivedData---------------------> " + channel_0_d);
                         addEntry(channel_0);
 
                         addToLog(text);
@@ -406,7 +425,7 @@ public class UARTDisplayActivity extends BaseActivity {
        // Log.d("ddd ", "random----------->" + rdNum);
 
         //here, we choose to display max 10 point on the view port and we scroll to end
-        series.appendData(new DataPoint(lastX++, y), true, 50);
+        series.appendData(new DataPoint(lastX++, y), true, 400);
     }
 //    private void addEntry() {
 //        //here, we choose to display max 10 point on the view port and we scroll to end

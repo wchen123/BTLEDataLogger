@@ -68,8 +68,9 @@
     <com.jjoe64.graphview.GraphView
         android:id="@+id/logGraphView"
         style="@style/AppTheme.LogText"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="173dp"
+        android:layout_gravity="right"
         android:nestedScrollingEnabled="true" />
 
     <LinearLayout
