@@ -46,21 +46,50 @@
         android:layout_below="@+id/textView3"
         android:layout_alignParentStart="true" />
 
-    <RelativeLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/relativeLayout"
-        android:layout_below="@+id/textView6"
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="210dp"
+        android:layout_marginTop="13dp"
+        android:layout_below="@+id/logTextView"
         android:layout_alignParentStart="true">
 
-        <com.jjoe64.graphview.GraphView
-            android:id="@+id/logGraphView"
-            style="@style/AppTheme.LogText"
-            android:layout_width="wrap_content"
-            android:layout_height="200dp"
-            android:layout_gravity="right"
-            android:nestedScrollingEnabled="true" />
-    </RelativeLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/textView6"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/uart_log_graph"
+                android:textAppearance="?android:attr/textAppearanceLarge" />
+
+            <com.jjoe64.graphview.GraphView
+                android:id="@+id/logGraphView"
+                style="@style/AppTheme.LogText"
+                android:layout_width="wrap_content"
+                android:layout_height="200dp"
+                android:layout_gravity="right"
+                android:nestedScrollingEnabled="true" />
+
+            <TextView
+                android:id="@+id/textView4"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/uart_log_graph1"
+                android:textAppearance="?android:attr/textAppearanceLarge" />
+
+            <com.jjoe64.graphview.GraphView
+                android:id="@+id/graphView2"
+                style="@style/AppTheme.LogText"
+                android:layout_width="wrap_content"
+                android:layout_height="200dp"
+                android:layout_gravity="right"
+                android:nestedScrollingEnabled="true" />
+
+        </LinearLayout>
+    </ScrollView>
 
     <LinearLayout
         android:orientation="horizontal"
@@ -110,15 +139,6 @@
         android:layout_below="@+id/startStopLogButton"
         android:layout_weight="1"
         android:text="@string/uart_log_header"
-        android:textAppearance="?android:attr/textAppearanceLarge" />
-
-    <TextView
-        android:id="@+id/textView6"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentStart="true"
-        android:layout_below="@+id/logTextView"
-        android:text="@string/uart_log_graph"
         android:textAppearance="?android:attr/textAppearanceLarge" />
 
 </RelativeLayout>
