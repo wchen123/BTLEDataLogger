@@ -31,8 +31,8 @@ import java.util.Random;
 public class UARTDisplayActivity extends BaseActivity {
     // tag for logging
     private final static String TAG = UARTService.class.getSimpleName();
-    private static final Random RANDOM = new Random();
     private LineGraphSeries<DataPoint> series;
+    private LineGraphSeries<DataPoint> series1;
     private int lastX = 0;
 
 
@@ -65,37 +65,30 @@ public class UARTDisplayActivity extends BaseActivity {
 
 
 
-        //we get graph view instance
+        //we get graph view instance for si1153
         GraphView graph = (GraphView)findViewById(R.id.logGraphView);
-        //data
         series = new LineGraphSeries<DataPoint>();
         graph.addSeries(series);
-        //customize a little bit view port
-     //   graph.getLegendRenderer().setWidth(90);
-        Viewport viewport = graph.getViewport();
-//        viewport.setYAxisBoundsManual(true);
-//        viewport.setMinY(0);
-//        viewport.setMaxY(1000);
+        setGraphUI(graph);
+        //data
+//        series = new LineGraphSeries<DataPoint>();
+//        graph.addSeries(series);
+//        Viewport viewport = graph.getViewport();
+//        // activate horizontal zooming and scrolling
+//        viewport.setScalable(true);
+//        // activate horizontal scrolling
 //        viewport.setScrollable(true);
+//        // activate horizontal and vertical zooming and scrolling
+//        viewport.setScalableY(true);
+//        // activate vertical scrolling
+//         viewport.setScrollableY(true);
+//        graph.getGridLabelRenderer().setPadding(96);
 
-        // activate horizontal zooming and scrolling
-        viewport.setScalable(true);
-
-// activate horizontal scrolling
-        viewport.setScrollable(true);
-
-// activate horizontal and vertical zooming and scrolling
-        viewport.setScalableY(true);
-
-// activate vertical scrolling
-         viewport.setScrollableY(true);
-
-        graph.getGridLabelRenderer().setPadding(96);
-     //   graph.getGridLabelRenderer().setNumHorizontalLabels(6);
-      //  graph.getGridLabelRenderer().setNumVerticalLabels(32);
-      //  graph.getGridLabelRenderer().setLabelVerticalWidth(32);
-
-
+        // we get graph view instance for accelerometer
+        GraphView accelGraph = (GraphView)findViewById(R.id.graphView2);
+        series1 = new LineGraphSeries<DataPoint>();
+        accelGraph.addSeries(series1);
+        setGraphUI(accelGraph);
 
         logFileNameEditText = (EditText)findViewById(R.id.logFileNameEditText);
         startStopLogButton = (Button)findViewById(R.id.startStopLogButton);
@@ -122,43 +115,6 @@ public class UARTDisplayActivity extends BaseActivity {
         Intent logServiceIntent = new Intent(this, LogService.class);
         bindService(logServiceIntent, logServiceConnection, Context.BIND_AUTO_CREATE);
     }
-
-    //wu's code
-    //@Override
-//    protected void onResume() {
-//        super.onResume();
-//        for (int i=0; i< 100; i++) {
-//            addEntry();
-//        }
-
-        //we 're going to simulate with thread that append data to the graph
-//        new Thread(new Runnable() {
-//            @Override
-//            public void run() {
-//                //we add 100 new enties
-//                for (int i=0; i< 100; i++) {
-//                    runOnUiThread(new Runnable() {
-//                        @Override
-//                        public void run() {
-//                            addEntry();
-//                        }
-//                    });
-//
-//                    //sllep to slow down the add of entries
-//                    try{
-//                        Thread.sleep(600);
-//
-//                    }catch (InterruptedException e){
-//                        // e.printStackTrace();
-//                    }
-//
-//                }
-//            }
-//        });
-  //  }
-
-
-
 
 
     private static IntentFilter makeGattUpdateIntentFilter() {
@@ -263,7 +219,8 @@ public class UARTDisplayActivity extends BaseActivity {
         }
     };
 
-    private void addToLog(final String text) {
+    private void addToLog(final String text)
+    {
 
 //        try {
 //            Thread.sleep(600);
@@ -419,28 +376,29 @@ public class UARTDisplayActivity extends BaseActivity {
         }
     }
 
-    //add random data to graph
+    //add  data to graph
     private void addEntry(int y) {
        // double rdNum = RANDOM.nextDouble() * 1000d;
        // Log.d("ddd ", "random----------->" + rdNum);
 
         //here, we choose to display max 10 point on the view port and we scroll to end
         series.appendData(new DataPoint(lastX++, y), true, 400);
+        series1.appendData(new DataPoint(lastX++, y), true, 400);
     }
-//    private void addEntry() {
-//        //here, we choose to display max 10 point on the view port and we scroll to end
-//        runOnUiThread(new Runnable() {
-//            @Override
-//            public void run() {
-//                try {
-//                    series.appendData(new DataPoint(lastX++, RANDOM.nextDouble() * 10d), true, 10);
-//                    Log.d("ddd ", "random----------->" + RANDOM.nextDouble());
-//                }
-//                catch(Exception e) {
-//                    Log.e(TAG, e.toString());
-//                }
-//            }
-//
-//        });
-//    }
+
+    //set up the auto scroll and zoom when ploting in real time.
+    private void setGraphUI(GraphView graph) {
+        //data
+
+        Viewport viewport = graph.getViewport();
+        // activate horizontal zooming and scrolling
+        viewport.setScalable(true);
+        // activate horizontal scrolling
+        viewport.setScrollable(true);
+        // activate horizontal and vertical zooming and scrolling
+        viewport.setScalableY(true);
+        // activate vertical scrolling
+        viewport.setScrollableY(true);
+        graph.getGridLabelRenderer().setPadding(96);
+    }
 }
