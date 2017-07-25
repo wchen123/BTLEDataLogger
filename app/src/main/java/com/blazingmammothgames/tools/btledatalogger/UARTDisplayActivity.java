@@ -31,10 +31,10 @@ import java.util.Random;
 public class UARTDisplayActivity extends BaseActivity {
     // tag for logging
     private final static String TAG = UARTService.class.getSimpleName();
-    private LineGraphSeries<DataPoint> series;
-    private LineGraphSeries<DataPoint> series1;
-    private int lastX = 0;
+    private LineGraphSeries<DataPoint> series, series1;
 
+    private int lastX = 0;
+    private String packets = new String();
 
 
     private EditText logFileNameEditText;
@@ -295,17 +295,19 @@ public class UARTDisplayActivity extends BaseActivity {
                     final byte[] rxData = intent.getByteArrayExtra(UARTService.EXTRA_DATA_RX);
                     try {
                         String text = new String(rxData, "UTF-8");
+
                         Log.d("data", "text---> " + text);
-                        String[] received_Data = text.split(",");
-                        String received_Data0 = received_Data[0];
-                        String received_Data1 = received_Data[1];
-                        String received_Data2 = received_Data[2];
+                  //      Log.d("data", "receivedData---------------------> " + channel_0_d);
 
-                        int channel_0 = Integer.parseInt(received_Data0);
-                        double channel_0_d = channel_0/10000.0;
-                        Log.d("data", "receivedData---------------------> " + channel_0_d);
-                        addEntry(channel_0);
 
+                        packets = packets + text;
+                        Log.d("data", "packets length---------------------> " + packets.length());
+                        if (packets.length() >= 36) {
+                            Log.d("data", "packets------------> " + packets);
+                            addEntry(packets);
+
+                            packets = new String();
+                        }
                         addToLog(text);
                     }
                     catch(Exception e) {
@@ -377,13 +379,17 @@ public class UARTDisplayActivity extends BaseActivity {
     }
 
     //add  data to graph
-    private void addEntry(int y) {
-       // double rdNum = RANDOM.nextDouble() * 1000d;
-       // Log.d("ddd ", "random----------->" + rdNum);
+    private void addEntry(String packet) {
+        String[] received_Data = packet.split(",");
 
+        //    String received_Data1 = received_Data[1];
+        //   String received_Data2 = received_Data[2];
+
+        int si1153_ch0 = Integer.parseInt(received_Data[0]);
+        int lis3de_ax  = Integer.parseInt(received_Data[3]);
         //here, we choose to display max 10 point on the view port and we scroll to end
-        series.appendData(new DataPoint(lastX++, y), true, 400);
-        series1.appendData(new DataPoint(lastX++, y), true, 400);
+        series.appendData(new DataPoint(lastX++, si1153_ch0), true, 400);
+        series1.appendData(new DataPoint(lastX++, lis3de_ax), true, 400);
     }
 
     //set up the auto scroll and zoom when ploting in real time.
