@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
+import android.graphics.Color;
 import android.os.IBinder;
 import android.support.v4.content.LocalBroadcastManager;
 import android.os.Bundle;
@@ -21,6 +22,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.jjoe64.graphview.GraphView;
+import com.jjoe64.graphview.LegendRenderer;
 import com.jjoe64.graphview.Viewport;
 import com.jjoe64.graphview.series.DataPoint;
 import com.jjoe64.graphview.series.LineGraphSeries;
@@ -31,7 +33,7 @@ import java.util.Random;
 public class UARTDisplayActivity extends BaseActivity {
     // tag for logging
     private final static String TAG = UARTService.class.getSimpleName();
-    private LineGraphSeries<DataPoint> series, series1;
+    private LineGraphSeries<DataPoint> series, si1153_series1,si1153_series2, series1;
 
     private int lastX = 0;
     private String packets = new String();
@@ -68,21 +70,18 @@ public class UARTDisplayActivity extends BaseActivity {
         //we get graph view instance for si1153
         GraphView graph = (GraphView)findViewById(R.id.logGraphView);
         series = new LineGraphSeries<DataPoint>();
+        si1153_series1 = new LineGraphSeries<DataPoint>();
+        si1153_series2 = new LineGraphSeries<DataPoint>();
+        si1153_series1.setColor(Color.RED);
+        si1153_series2.setColor(Color.GREEN);
         graph.addSeries(series);
+        graph.addSeries(si1153_series1);
+        graph.addSeries(si1153_series2);
+        series.setTitle("ch0");
+        si1153_series1.setTitle("ch1");
+        si1153_series2.setTitle("ch2");
         setGraphUI(graph);
-        //data
-//        series = new LineGraphSeries<DataPoint>();
-//        graph.addSeries(series);
-//        Viewport viewport = graph.getViewport();
-//        // activate horizontal zooming and scrolling
-//        viewport.setScalable(true);
-//        // activate horizontal scrolling
-//        viewport.setScrollable(true);
-//        // activate horizontal and vertical zooming and scrolling
-//        viewport.setScalableY(true);
-//        // activate vertical scrolling
-//         viewport.setScrollableY(true);
-//        graph.getGridLabelRenderer().setPadding(96);
+
 
         // we get graph view instance for accelerometer
         GraphView accelGraph = (GraphView)findViewById(R.id.graphView2);
@@ -386,16 +385,27 @@ public class UARTDisplayActivity extends BaseActivity {
         //   String received_Data2 = received_Data[2];
 
         int si1153_ch0 = Integer.parseInt(received_Data[0]);
+        int si1153_ch1 = Integer.parseInt(received_Data[1]);
+        int si1153_ch2 = Integer.parseInt(received_Data[2]);
+
         int lis3de_ax  = Integer.parseInt(received_Data[3]);
+
+
         //here, we choose to display max 10 point on the view port and we scroll to end
         series.appendData(new DataPoint(lastX++, si1153_ch0), true, 400);
+        si1153_series1.appendData(new DataPoint(lastX++, si1153_ch1), true, 400);
+        si1153_series2.appendData(new DataPoint(lastX++, si1153_ch2), true, 400);
+
+        //accel data
         series1.appendData(new DataPoint(lastX++, lis3de_ax), true, 400);
     }
 
     //set up the auto scroll and zoom when ploting in real time.
     private void setGraphUI(GraphView graph) {
         //data
-
+        graph.getLegendRenderer().setVisible(true);
+        graph.getLegendRenderer().setAlign(LegendRenderer.LegendAlign.TOP);
+        graph.getLegendRenderer().setTextSize(20);
         Viewport viewport = graph.getViewport();
         // activate horizontal zooming and scrolling
         viewport.setScalable(true);
@@ -406,5 +416,6 @@ public class UARTDisplayActivity extends BaseActivity {
         // activate vertical scrolling
         viewport.setScrollableY(true);
         graph.getGridLabelRenderer().setPadding(96);
+
     }
 }
