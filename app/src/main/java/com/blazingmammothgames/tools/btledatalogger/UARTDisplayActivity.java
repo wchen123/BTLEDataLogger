@@ -27,13 +27,15 @@ import com.jjoe64.graphview.Viewport;
 import com.jjoe64.graphview.series.DataPoint;
 import com.jjoe64.graphview.series.LineGraphSeries;
 
+import java.io.IOError;
 import java.util.Random;
 
 
 public class UARTDisplayActivity extends BaseActivity {
     // tag for logging
     private final static String TAG = UARTService.class.getSimpleName();
-    private LineGraphSeries<DataPoint> series, si1153_series1,si1153_series2, series1;
+    private LineGraphSeries<DataPoint> series, si1153_series1,si1153_series2;
+    private LineGraphSeries<DataPoint> series1, lisde_series1, lisde_series2;
 
     private int lastX = 0;
     private String packets = new String();
@@ -86,7 +88,16 @@ public class UARTDisplayActivity extends BaseActivity {
         // we get graph view instance for accelerometer
         GraphView accelGraph = (GraphView)findViewById(R.id.graphView2);
         series1 = new LineGraphSeries<DataPoint>();
+        lisde_series1 = new LineGraphSeries<DataPoint>();
+        lisde_series2 = new LineGraphSeries<DataPoint>();
+        lisde_series1.setColor(Color.RED);
+        lisde_series2.setColor(Color.GREEN);
         accelGraph.addSeries(series1);
+        accelGraph.addSeries(lisde_series1);
+        accelGraph.addSeries(lisde_series2);
+        series1.setTitle("Ax");
+        lisde_series1.setTitle("Ay");
+        lisde_series2.setTitle("Az");
         setGraphUI(accelGraph);
 
         logFileNameEditText = (EditText)findViewById(R.id.logFileNameEditText);
@@ -300,8 +311,9 @@ public class UARTDisplayActivity extends BaseActivity {
 
 
                         packets = packets + text;
-                        Log.d("data", "packets length---------------------> " + packets.length());
-                        if (packets.length() >= 36) {
+                        Log.d("data", "rxData[17]--------------> " + (int)rxData[17]);
+                       // if (packets.length() >= 36) {
+                        if(rxData[17] == 10){
                             Log.d("data", "packets------------> " + packets);
                             addEntry(packets);
 
@@ -389,8 +401,14 @@ public class UARTDisplayActivity extends BaseActivity {
         int si1153_ch2 = Integer.parseInt(received_Data[2]);
 
         int lis3de_ax  = Integer.parseInt(received_Data[3]);
-
-
+        int lis3de_Ay  = Integer.parseInt(received_Data[4]);
+        int lis3de_Az  = Integer.parseInt(received_Data[5].trim());
+        Log.d("data", "lis3de_Az+++++++++++++++++++++ " + lis3de_Az);
+//        try {
+//            Thread.sleep(1000);
+//        }catch(Exception e) {
+//
+//        }
         //here, we choose to display max 10 point on the view port and we scroll to end
         series.appendData(new DataPoint(lastX++, si1153_ch0), true, 400);
         si1153_series1.appendData(new DataPoint(lastX++, si1153_ch1), true, 400);
@@ -398,6 +416,8 @@ public class UARTDisplayActivity extends BaseActivity {
 
         //accel data
         series1.appendData(new DataPoint(lastX++, lis3de_ax), true, 400);
+        lisde_series1.appendData(new DataPoint(lastX++, lis3de_Ay), true, 400);
+        lisde_series2.appendData(new DataPoint(lastX++, lis3de_Az), true, 400);
     }
 
     //set up the auto scroll and zoom when ploting in real time.
